@@ -6,6 +6,12 @@ impl Solution {
     }
 }
 
-fn main() {
-    println!("{:?}", Solution::solve());
+fn main() {}
+
+#[cfg(test)]
+mod tests {
+    use super::Solution;
+
+    #[test]
+    fn test() {}
 }
