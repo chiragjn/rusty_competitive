@@ -12,11 +12,10 @@ impl Solution {
         let mut s_intervals = intervals.clone();
         s_intervals.sort();
         let mut next_gte: Vec<usize> = vec![s_intervals.len(); s_intervals.len()];
-        let mut ptr: usize = 0;
 
         // O(N^2) !!
         for i in 0..s_intervals.len() {
-            ptr = i + 1;
+            let mut ptr = i + 1;
             while ptr < s_intervals.len() && s_intervals[ptr][0] < s_intervals[i][1] {
                 ptr += 1;
             }
@@ -25,10 +24,10 @@ impl Solution {
 
         let mut cache: Vec<Vec<i32>> = vec![vec![0, 1]; s_intervals.len() + 1];
         for i in (0..s_intervals.len() - 1).rev() {
-            cache[i][0] = cache[i][1];
+            cache[i][0] = max(cache[i + 1][0], cache[i + 1][1]);
             cache[i][1] = 1;
             if next_gte[i] < s_intervals.len() {
-                cache[i][1] += cache[next_gte[i]][1];
+                cache[i][1] += max(cache[next_gte[i]][0], cache[next_gte[i]][1])
             }
         }
         return s_intervals.len() as i32 - max(cache[0][0], cache[0][1]);
