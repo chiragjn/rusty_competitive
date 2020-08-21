@@ -19,13 +19,19 @@ impl Solution {
         if head.is_none() {
             return;
         }
-        let mut slow: Option<&Box<ListNode>> = head.as_ref();
+        let mut slow: Option<&mut Box<ListNode>> = head.as_ref();
         let mut fast: Option<&Box<ListNode>> = head.as_ref();
         while fast.unwrap().next.is_some() && fast.unwrap().next.as_ref().unwrap().next.is_some() {
             slow = slow.unwrap().next.as_ref();
             fast = fast.unwrap().next.as_ref().unwrap().next.as_ref();
         }
-        let mut nodes_stack: Vec<Box<ListNode>> = vec![];
+        let mut current = slow.unwrap().next.as_ref();
+        slow.unwrap().as_mut().next = None;
+        let mut nodes_stack: Vec<&Box<ListNode>> = vec![];
+        while let Some(curr) = current {
+            nodes_stack.push(curr);
+            current = curr.next.as_ref();
+        }
     }
 }
 
