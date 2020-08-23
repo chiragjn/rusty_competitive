@@ -1,5 +1,5 @@
 [package]
-name = "reorderlist"
+name = "streamchars"
 version = "0.1.0"
 authors = ["Chirag Jain"]
 edition = "2018"
