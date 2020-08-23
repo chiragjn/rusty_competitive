@@ -1,7 +1,5 @@
 use std::collections::HashMap;
-use std::ops::Deref;
 
-#[derive(Debug, Clone)]
 struct TrieNode {
     terminal: bool,
     children: HashMap<char, TrieNode>,
@@ -24,25 +22,8 @@ impl TrieNode {
     }
 }
 
-struct Immutable<T> {
-    value: T,
-}
-
-impl<T> Immutable<T> {
-    pub fn new(value: T) -> Self {
-        Immutable { value }
-    }
-}
-
-impl<T> Deref for Immutable<T> {
-    type Target = T;
-
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
-}
 struct StreamChecker<'t> {
-    root: Immutable<TrieNode>,
+    root: &'t TrieNode,
     threads: Vec<&'t TrieNode>,
 }
 
@@ -52,14 +33,15 @@ impl<'t> StreamChecker<'t> {
         for word in words {
             root.insert(word);
         }
+        let root_ref: &'t TrieNode = Box::leak(Box::new(root));
         return Self {
-            root: Immutable::new(root),
+            root: root_ref,
             threads: vec![],
         };
     }
 
     fn query(&mut self, letter: char) -> bool {
-        self.threads.push(&self.root);
+        self.threads.push(self.root);
         let mut i: usize = 0;
         loop {
             let n = self.threads.len();
