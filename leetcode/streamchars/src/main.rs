@@ -1,3 +1,12 @@
+// https://leetcode.com/problems/stream-of-characters/
+//
+// TODO: This is a very inefficient solution, plus involves Box::leak because of self referrential
+// struct which is not easy to reason about.
+//
+// There are much better solutions that are much faster and easier to implement:
+// Make a trie from reverse words, at every tick search the stream in reverse
+// Or Make a trie with KMP like error fail links, so on every tick search becomes O(1)
+
 use std::collections::HashMap;
 
 struct TrieNode {
