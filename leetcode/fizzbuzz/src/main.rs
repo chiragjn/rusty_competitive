@@ -27,7 +27,7 @@ mod tests {
     use super::Solution;
 
     macro_rules! S {
-        ($($s:expr),+) => {
+        ($($s:expr),*) => {
             vec![$(String::from($s),)*]
         };
     }
