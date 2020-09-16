@@ -1,4 +1,6 @@
-// Some terrible design going on over here
+// https://leetcode.com/submissions/detail/396673924/
+// I have won but at what cost! Some terrible design going on over here
+// TODO: Implement using indices into a Vec of nodes for simpler indirection
 
 struct BinTrieNode {
     left: Option<Box<BinTrieNode>>,
@@ -24,7 +26,7 @@ impl BinTrieNode {
         };
     }
 
-    fn insert(&mut self, val: u32, bits: usize) {
+    fn insert(&mut self, val: i32, bits: usize) {
         if bits == 0 {
             return;
         }
@@ -45,10 +47,9 @@ impl BinTrieNode {
         }
     }
 
-    fn max_xor(&self, val: u32, bits: usize) -> u32 {
+    fn max_xor(&self, val: i32, bits: usize) -> i32 {
         let mut current: Option<&BinTrieNode> = Some(self);
-        let mut answer: u32 = 0;
-        println!("\nGiven {}", val);
+        let mut answer: i32 = 0;
         for i in (0..bits).rev() {
             match current {
                 Some(c) => {
@@ -56,18 +57,14 @@ impl BinTrieNode {
                     if val & (1 << i) == 0 {
                         if c.right.is_some() {
                             current = borrowed(&c.right);
-                            print!("1");
                             answer |= 1;
                         } else {
-                            print!("0");
                             current = borrowed(&c.left);
                         }
                     } else {
                         if c.left.is_some() {
-                            print!("0");
                             current = borrowed(&c.left);
                         } else {
-                            print!("1");
                             current = borrowed(&c.right);
                             answer |= 1;
                         }
@@ -87,14 +84,12 @@ struct Solution {}
 impl Solution {
     pub fn find_maximum_xor(nums: Vec<i32>) -> i32 {
         let mut root = BinTrieNode::new();
-        nums.iter()
-            .map(|&x| root.insert(x as u32, 32))
-            .for_each(drop);
+        nums.iter().map(|&x| root.insert(x, 31)).for_each(drop);
         return nums
             .iter()
-            .map(|&x| root.max_xor(x as u32, 32))
+            .map(|&x| x ^ root.max_xor(x, 31))
             .max()
-            .unwrap_or(0) as i32;
+            .unwrap_or(0);
     }
 }
 
@@ -109,5 +104,9 @@ mod tests {
         assert_eq!(Solution::find_maximum_xor(vec![3, 10, 5, 25, 2, 8]), 28);
         assert_eq!(Solution::find_maximum_xor(vec![3]), 0);
         assert_eq!(Solution::find_maximum_xor(vec![10, 0, 5]), 15);
+        assert_eq!(
+            Solution::find_maximum_xor(vec![2147483647, 0, 2147483647]),
+            2147483647
+        );
     }
 }
