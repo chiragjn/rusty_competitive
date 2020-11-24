@@ -1,8 +1,10 @@
+// https://leetcode.com/problems/basic-calculator-ii/
+
 struct Solution {}
 
 impl Solution {
     pub fn calculate(s: String) -> i32 {
-        let mut chars: Vec<char> = s.chars().filter(|&c| c != ' ').collect();
+        let chars: Vec<char> = s.chars().filter(|&c| c != ' ').collect();
         let mut stack: Vec<i32> = vec![];
         let mut op: char = '+';
         let mut current_number: i32 = 0;
@@ -10,7 +12,8 @@ impl Solution {
             if c.is_digit(10) {
                 current_number *= 10;
                 current_number += c.to_digit(10).unwrap() as i32;
-            } else if !c.is_digit(10) || i == chars.len() - 1 {
+            }
+            if !c.is_digit(10) || i == chars.len() - 1 {
                 match op {
                     '+' => {
                         stack.push(current_number);
@@ -45,5 +48,9 @@ mod tests {
     use super::Solution;
 
     #[test]
-    fn test() {}
+    fn test() {
+        assert_eq!(Solution::calculate(String::from("3+2*2")), 7);
+        assert_eq!(Solution::calculate(String::from(" 3/2 ")), 1);
+        assert_eq!(Solution::calculate(String::from(" 3+5 / 2 ")), 5);
+    }
 }
