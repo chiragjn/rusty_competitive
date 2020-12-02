@@ -1,3 +1,4 @@
+use regex::Regex;
 use std::io::{self, BufRead, Stdin};
 
 struct InputUtils {
@@ -26,20 +27,25 @@ impl Iterator for InputUtils {
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> i64 {
-    let numbers: Vec<i64> = lines
-        .map(|s| s.parse::<i64>().expect("Failed parsing to i64"))
-        .collect();
-    // There are more efficient ways but our input is very small, so just brute force it
-    for i in 0..numbers.len() {
-        for j in i + 1..numbers.len() {
-            for k in j + 1..numbers.len() {
-                if numbers[i] + numbers[j] + numbers[k] == 2020 {
-                    return numbers[i] * numbers[j] * numbers[k];
-                }
-            }
+    let mut answer = 0;
+    let pattern =
+        Regex::new(r"(?P<low>\d+)-(?P<high>\d+) (?P<ch>[a-z]): (?P<password>[a-z]+)").unwrap();
+    for line in lines {
+        let captured = pattern
+            .captures(&line)
+            .expect(&format!("Failed to parse line {:?}", line));
+        let low: usize = captured["low"].parse().expect("Failed  to cast to int");
+        let high: usize = captured["high"].parse().expect("Failed to cast to int");
+        let ch: char = captured["ch"]
+            .chars()
+            .next()
+            .expect("Failed to get character after range");
+        let ch_count = captured["password"].chars().filter(|&c| c == ch).count();
+        if ch_count >= low && ch_count <= high {
+            answer += 1;
         }
     }
-    unreachable!("Invalid input, no three numbers add up to 2020");
+    return answer;
 }
 
 fn main() {
@@ -54,16 +60,13 @@ mod tests {
 
     #[test]
     fn test() {
-        let test_input = r#"1721
-979
-366
-299
-675
-1456"#;
+        let test_input = r#"1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc"#;
         let it = test_input
             .split('\n')
             .into_iter()
             .map(|part| part.to_string());
-        assert_eq!(solve(Box::new(it)), 241861950);
+        assert_eq!(solve(Box::new(it)), 2);
     }
 }
