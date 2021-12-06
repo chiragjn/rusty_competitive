@@ -82,8 +82,8 @@ fn _simulate_board(
                 .collect(),
         );
     }
-    for (i, draw) in draws.iter().enumerate() {
-        if let Some(unmarked_sum) = _mark(&mut board, *draw) {
+    for (i, &draw) in draws.iter().enumerate() {
+        if let Some(unmarked_sum) = _mark(&mut board, draw) {
             return Some((i, draw * unmarked_sum));
         }
     }
@@ -108,7 +108,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
             break;
         }
     }
-    let (_, answer) = wins.into_iter().min().unwrap();
+    let &(_, answer) = wins.iter().min().unwrap();
     return answer;
 }
 

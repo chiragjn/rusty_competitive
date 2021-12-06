@@ -108,7 +108,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
             break;
         }
     }
-    let (_, answer) = wins.into_iter().max().unwrap();
+    let &(_, answer) = wins.iter().max().unwrap();
     return answer;
 }
 

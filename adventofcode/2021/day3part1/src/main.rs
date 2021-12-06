@@ -39,7 +39,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> i64 {
     }
     let mut gamma = 0;
     let mut epsilon = 0;
-    for (i, count) in counts.into_iter().rev().enumerate() {
+    for (i, &count) in counts.iter().rev().enumerate() {
         if count > (n - count) {
             gamma |= 1 << i;
         } else {
