@@ -30,9 +30,9 @@ fn print_grid(grid: &Vec<Vec<bool>>) {
     for row in grid.iter() {
         for &value in row.iter() {
             if value {
-                print!("#");
+                print!("|");
             } else {
-                print!(".");
+                print!(" ");
             }
         }
         println!("");
