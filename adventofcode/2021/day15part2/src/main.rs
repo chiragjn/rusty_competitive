@@ -6,9 +6,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -16,10 +16,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -30,7 +27,7 @@ fn get_value(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
     let tile_j = y / c;
     let i = x - (r * tile_i);
     let j = y - (c * tile_j);
-    return ((grid[i][j] + (tile_i as u64) + (tile_j as u64) - 1) % 9) + 1;
+    ((grid[i][j] + (tile_i as u64) + (tile_j as u64) - 1) % 9) + 1
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
@@ -78,7 +75,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     for i in 0..nr {
         println!("{:?} ... {:?}", &G[i][0..5], &G[i][(nc - 5)..nc]);
     }
-    return cache[1][0] - grid[0][0];
+    cache[1][0] - grid[0][0]
 }
 
 fn main() {

@@ -9,9 +9,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -19,10 +19,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -72,7 +69,7 @@ fn to_packets<'a>(bits: &'a [char], num_packets: Option<usize>) -> (Vec<Packet<'
             }
         }
     }
-    return (packets, ptr);
+    (packets, ptr)
 }
 
 fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
@@ -114,7 +111,7 @@ fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
                     packet_type: PacketType::OPERATOR(o),
                     subpackets,
                 };
-                return (packet, 22 + _bits_read);
+                (packet, 22 + _bits_read)
             }
             '1' => {
                 let num_packets: usize = to_value(&bits[7..18]).unwrap() as _;
@@ -125,7 +122,7 @@ fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
                     packet_type: PacketType::OPERATOR(o),
                     subpackets,
                 };
-                return (packet, 18 + _bits_read);
+                (packet, 18 + _bits_read)
             }
             _ => {
                 unreachable!("invalid char, should be a bit 0/1");
@@ -147,7 +144,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         );
     }
     let (packet, _) = to_packet(&packet[..]);
-    return packet.version_sum();
+    packet.version_sum()
 }
 
 fn main() {

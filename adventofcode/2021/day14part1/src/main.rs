@@ -7,9 +7,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -17,10 +17,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -34,12 +31,12 @@ fn react(polymer: Vec<char>, reactions: &HashMap<(char, char), char>) -> Vec<cha
         new_polymer.push(reactions[&(c1, c2)]);
     }
     new_polymer.push(*polymer.last().unwrap());
-    return new_polymer;
+    new_polymer
 }
 
 fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
     let mut polymer: Vec<char> = vec![];
-    while let Some(line) = lines.next() {
+    for line in &mut lines {
         if line.trim() == "" {
             break;
         }
@@ -69,7 +66,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
     }
     let max_count = *counts.values().max().unwrap_or(&0);
     let min_count = *counts.values().min().unwrap_or(&0);
-    return max_count - min_count;
+    max_count - min_count
 }
 
 fn main() {

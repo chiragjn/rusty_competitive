@@ -11,9 +11,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -21,10 +21,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -44,7 +41,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> i64 {
     for line in lines {
         let captured = pattern
             .captures(&line)
-            .expect(&format!("Failed to parse line {:?}", line));
+            .unwrap_or_else(|| panic!("Failed to parse line {:?}", line));
         let x1: i64 = captured["x1"].parse().expect("Failed to cast to int");
         let y1: i64 = captured["y1"].parse().expect("Failed to cast to int");
         let x2: i64 = captured["x2"].parse().expect("Failed to cast to int");

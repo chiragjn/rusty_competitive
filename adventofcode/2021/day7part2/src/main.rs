@@ -6,9 +6,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -16,10 +16,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -30,7 +27,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> i64 {
         .split(',')
         .map(|s| s.parse::<i64>().expect("Failed parsing to i64"))
         .collect();
-    depths.sort();
+    depths.sort_unstable();
     // how do we solve this analytically?
     let mut answer: i64 = i64::MAX;
     let low = *depths.first().unwrap();
@@ -43,7 +40,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> i64 {
         }
         answer = answer.min(cost);
     }
-    return answer;
+    answer
 }
 
 fn main() {

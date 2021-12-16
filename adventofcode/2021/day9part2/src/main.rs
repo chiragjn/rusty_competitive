@@ -9,9 +9,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -19,10 +19,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -52,7 +49,7 @@ fn basin_size(grid: &Vec<Vec<u8>>, i: usize, j: usize) -> u64 {
             visited.insert((x, y + 1));
         }
     }
-    return size;
+    size
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
@@ -85,7 +82,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
             }
         }
     }
-    basin_sizes.sort();
+    basin_sizes.sort_unstable();
     basin_sizes.reverse();
     return (&basin_sizes[0..3]).iter().product();
 }

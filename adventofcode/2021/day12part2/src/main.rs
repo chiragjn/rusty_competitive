@@ -7,9 +7,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -17,10 +17,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -35,26 +32,26 @@ enum Node<'a> {
 
 fn to_node<'a>(s: &'a str) -> Node<'a> {
     if s == "start" {
-        return Node::START;
+        Node::START
     } else if s == "end" {
-        return Node::END;
+        Node::END
     } else if s.to_uppercase() == s {
-        return Node::UPPER(s);
+        Node::UPPER(s)
     } else {
-        return Node::LOWER(s);
+        Node::LOWER(s)
     }
 }
 
 fn node_to_str<'a>(node: &'a Node) -> &'a str {
     match node {
         Node::START => {
-            return "start";
+            "start"
         }
         Node::END => {
-            return "end";
+            "end"
         }
         Node::LOWER(x) | Node::UPPER(x) => {
-            return x;
+            x
         }
         Node::PLACEHOLDER => {
             unreachable!("Node::PLACEHOLDER not supported");
@@ -74,20 +71,20 @@ struct PathsCounter<'a> {
 
 impl<'a> PathsCounter<'a> {
     fn new(graph: &'a HashMap<Node<'a>, Vec<Node<'a>>>) -> Self {
-        return PathsCounter {
+        PathsCounter {
             graph,
             visited: HashSet::new(),
             twice_allowed_for: &Node::PLACEHOLDER,
             visited_count: 0,
             buffer: vec![],
             paths: HashSet::new(),
-        };
+        }
     }
 
     fn _traverse(&mut self, node: &'a Node<'a>) -> u64 {
         if *node == Node::END {
             self.paths.insert(self.buffer.join("-"));
-            return 1;
+            1
         } else {
             self.buffer.push(node_to_str(node));
             if node == self.twice_allowed_for {
@@ -115,7 +112,7 @@ impl<'a> PathsCounter<'a> {
 
             self.buffer.pop();
 
-            return paths;
+            paths
         }
     }
 
@@ -127,7 +124,7 @@ impl<'a> PathsCounter<'a> {
                 self._traverse(&Node::START);
             }
         }
-        return self.paths.len() as u64;
+        self.paths.len() as u64
     }
 }
 
@@ -139,14 +136,14 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
         let u = to_node(
             parts
                 .next()
-                .expect(&format!("Failed to split by line {} '-'", line)),
+                .unwrap_or_else(|| panic!("Failed to split by line {} '-'", line)),
         );
         let v = to_node(
             parts
                 .next()
-                .expect(&format!("Failed to split by line {} '-'", line)),
+                .unwrap_or_else(|| panic!("Failed to split by line {} '-'", line)),
         );
-        graph.entry(u.clone()).or_default().push(v.clone());
+        graph.entry(u).or_default().push(v);
         graph.entry(v).or_default().push(u);
     }
     return PathsCounter::new(&graph).count();

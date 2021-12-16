@@ -7,9 +7,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -17,10 +17,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -34,13 +31,13 @@ enum Node<'a> {
 
 fn to_node<'a>(s: &'a str) -> Node<'a> {
     if s == "start" {
-        return Node::START;
+        Node::START
     } else if s == "end" {
-        return Node::END;
+        Node::END
     } else if s.to_uppercase() == s {
-        return Node::UPPER(s);
+        Node::UPPER(s)
     } else {
-        return Node::LOWER(s);
+        Node::LOWER(s)
     }
 }
 
@@ -51,7 +48,7 @@ fn traverse<'a>(
     graph: &'a HashMap<Node<'a>, Vec<Node<'a>>>,
 ) -> u64 {
     if *node == Node::END {
-        return 1;
+        1
     } else {
         if let Node::LOWER(_) | Node::START = node {
             visited.insert(node);
@@ -68,7 +65,7 @@ fn traverse<'a>(
             visited.remove(node);
         }
 
-        return paths;
+        paths
     }
 }
 
@@ -80,18 +77,18 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
         let u = to_node(
             parts
                 .next()
-                .expect(&format!("Failed to split by line {} '-'", line)),
+                .unwrap_or_else(|| panic!("Failed to split by line {} '-'", line)),
         );
         let v = to_node(
             parts
                 .next()
-                .expect(&format!("Failed to split by line {} '-'", line)),
+                .unwrap_or_else(|| panic!("Failed to split by line {} '-'", line)),
         );
-        graph.entry(u.clone()).or_default().push(v.clone());
+        graph.entry(u).or_default().push(v);
         graph.entry(v).or_default().push(u);
     }
     let mut visited: HashSet<&Node> = HashSet::new();
-    return traverse(&Node::START, &mut visited, &graph);
+    traverse(&Node::START, &mut visited, &graph)
 }
 
 fn main() {

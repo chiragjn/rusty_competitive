@@ -6,9 +6,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -16,17 +16,14 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u32 {
     let mut answer: u32 = 0;
     for line in lines {
-        let mut parts = line.split(" | ").into_iter();
+        let mut parts = line.split(" | ");
         parts.next();
         let code = parts.next().expect("Failed to split by | to get two parts");
         for signals in code.trim().split_whitespace().into_iter() {
@@ -38,7 +35,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u32 {
             }
         }
     }
-    return answer;
+    answer
 }
 
 fn main() {

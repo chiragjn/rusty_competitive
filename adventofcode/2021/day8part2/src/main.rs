@@ -8,9 +8,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -18,17 +18,14 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
 fn is_subset(a: &str, b: &str) -> bool {
     let aset: HashSet<char> = HashSet::from_iter(a.chars());
     let bset: HashSet<char> = HashSet::from_iter(b.chars());
-    return aset.is_subset(&bset);
+    aset.is_subset(&bset)
 }
 
 fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
@@ -63,8 +60,7 @@ fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
     }
     let nine_combo = len_six
         .iter()
-        .filter(|&&b| is_subset(digit2combo[&4], b))
-        .map(|&c| c)
+        .filter(|&&b| is_subset(digit2combo[&4], b)).copied()
         .next()
         .unwrap();
     digit2combo.insert(9, nine_combo);
@@ -72,8 +68,7 @@ fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
 
     let zero_combo = len_six
         .iter()
-        .filter(|&&b| is_subset(digit2combo[&7], b))
-        .map(|&c| c)
+        .filter(|&&b| is_subset(digit2combo[&7], b)).copied()
         .next()
         .unwrap();
     digit2combo.insert(0, zero_combo);
@@ -83,8 +78,7 @@ fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
 
     let five_combo = len_five
         .iter()
-        .filter(|&&a| is_subset(a, digit2combo[&6]))
-        .map(|&c| c)
+        .filter(|&&a| is_subset(a, digit2combo[&6])).copied()
         .next()
         .unwrap();
     digit2combo.insert(5, five_combo);
@@ -92,8 +86,7 @@ fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
 
     let three_combo = len_five
         .iter()
-        .filter(|&&b| is_subset(digit2combo[&7], b))
-        .map(|&c| c)
+        .filter(|&&b| is_subset(digit2combo[&7], b)).copied()
         .next()
         .unwrap();
     digit2combo.insert(3, three_combo);
@@ -104,24 +97,24 @@ fn decode(observations: &Vec<&str>, to_decode: &Vec<&str>) -> u64 {
     let mut combo2digit: HashMap<String, u64> = HashMap::new();
     for (&digit, &combo) in digit2combo.iter() {
         let mut combo_chars: Vec<char> = combo.chars().collect();
-        combo_chars.sort();
+        combo_chars.sort_unstable();
         let sorted_combo: String = combo_chars.iter().collect();
         combo2digit.insert(sorted_combo, digit);
     }
     let mut decoded = 0;
     for &combo in to_decode.iter() {
         let mut combo_chars: Vec<char> = combo.chars().collect();
-        combo_chars.sort();
+        combo_chars.sort_unstable();
         let sorted_combo: String = combo_chars.iter().collect();
         decoded = decoded * 10 + combo2digit[&sorted_combo];
     }
-    return decoded;
+    decoded
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     let mut answer: u64 = 0;
     for line in lines {
-        let mut parts = line.split(" | ").into_iter();
+        let mut parts = line.split(" | ");
         let observations: Vec<&str> = parts
             .next()
             .expect("Failed to get first part")
@@ -136,7 +129,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
             .collect();
         answer += decode(&observations, &to_decode);
     }
-    return answer;
+    answer
 }
 
 fn main() {

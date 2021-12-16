@@ -6,9 +6,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -16,10 +16,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -58,7 +55,7 @@ fn _mark(board: &mut Vec<Vec<Cell>>, draw: u64) -> Option<u64> {
         }
         return Some(sum);
     }
-    return None;
+    None
 }
 
 fn _simulate_board(
@@ -85,7 +82,7 @@ fn _simulate_board(
             return Some((i, draw * unmarked_sum));
         }
     }
-    return None;
+    None
 }
 
 fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
@@ -107,7 +104,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         }
     }
     let &(_, answer) = wins.iter().max().unwrap();
-    return answer;
+    answer
 }
 
 fn main() {

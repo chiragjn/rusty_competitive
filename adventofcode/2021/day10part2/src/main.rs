@@ -8,9 +8,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -18,10 +18,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -52,9 +49,9 @@ fn score(line: &str) -> u64 {
     }
     let mut score = 0;
     for c in stack.iter().rev() {
-        score = score * 5 + SCORE[&OPEN2CLOSE[&c]];
+        score = score * 5 + SCORE[&OPEN2CLOSE[c]];
     }
-    return score;
+    score
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
@@ -63,8 +60,8 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
         .map(|line| score(&line))
         .filter(|&s| s > 0)
         .collect();
-    scores.sort();
-    return scores[scores.len() / 2];
+    scores.sort_unstable();
+    scores[scores.len() / 2]
 }
 
 fn main() {

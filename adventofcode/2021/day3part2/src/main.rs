@@ -6,9 +6,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -16,10 +16,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -32,14 +29,14 @@ struct BinTrieNode {
 
 impl BinTrieNode {
     fn new() -> Self {
-        return BinTrieNode {
+        BinTrieNode {
             counts: [0, 0],
             children: [None, None],
-        };
+        }
     }
 
     fn insert(&mut self, string: &[char]) {
-        if string.len() == 0 {
+        if string.is_empty() {
             return;
         }
         let i: usize = string[0]
@@ -65,12 +62,10 @@ impl BinTrieNode {
             } else {
                 1
             }
+        } else if self.counts[1] < self.counts[0] {
+            1
         } else {
-            if self.counts[1] < self.counts[0] {
-                1
-            } else {
-                0
-            }
+            0
         };
         *answer = (*answer << 1) | (i as i64);
         if let Some(child) = &self.children[i] {
@@ -89,7 +84,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> i64 {
     root.get(true, &mut o2);
     let mut co2 = 0;
     root.get(false, &mut co2);
-    return o2 * co2;
+    o2 * co2
 }
 
 fn main() {

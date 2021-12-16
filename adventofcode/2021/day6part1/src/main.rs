@@ -8,9 +8,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -18,10 +18,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -40,7 +37,7 @@ fn simulate(initials: &Vec<u64>, last_day: u64) -> u64 {
             pq.push(Reverse(x + 9));
         }
     }
-    return pq.len() as u64;
+    pq.len() as u64
 }
 
 fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
@@ -51,7 +48,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         .map(|s| s.parse::<u64>().expect("Failed parsing to u64"))
         .collect();
     let period = 80;
-    return simulate(&numbers, period);
+    simulate(&numbers, period)
 }
 
 fn main() {

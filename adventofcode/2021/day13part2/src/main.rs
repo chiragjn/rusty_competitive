@@ -7,9 +7,9 @@ struct InputUtils {
 
 impl Default for InputUtils {
     fn default() -> Self {
-        return Self {
+        Self {
             stream: io::stdin(),
-        };
+        }
     }
 }
 
@@ -17,10 +17,7 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        match self.stream.lock().lines().next() {
-            Some(line) => Some(line.unwrap().trim().to_string()),
-            None => None,
-        }
+        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -33,7 +30,7 @@ fn print_grid(grid: &Vec<Vec<bool>>) {
                 print!(" ");
             }
         }
-        println!("");
+        println!();
     }
 }
 
@@ -83,16 +80,16 @@ fn fold(grid: Vec<Vec<bool>>, fold_line: &FoldLine) -> Vec<Vec<bool>> {
             }
         }
     }
-    return new_grid;
+    new_grid
 }
 
 fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
     let mut points: Vec<(usize, usize)> = vec![];
-    while let Some(line) = lines.next() {
+    for line in &mut lines {
         if line.trim() == "" {
             break;
         }
-        let mut parts = line.trim().split(",");
+        let mut parts = line.trim().split(',');
         let x: usize = parts
             .next()
             .and_then(|p| p.parse().ok())
@@ -123,8 +120,7 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         parts.next();
         parts.next();
         let mut parts = parts
-            .next()
-            .and_then(|p| Some(p.split('=')))
+            .next().map(|p| p.split('='))
             .expect("Third word is not in x/y=\\d+ format");
         let var = parts
             .next()
