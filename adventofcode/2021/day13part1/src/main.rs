@@ -17,7 +17,11 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -107,7 +111,8 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         parts.next();
         parts.next();
         let mut parts = parts
-            .next().map(|p| p.split('='))
+            .next()
+            .map(|p| p.split('='))
             .expect("Third word is not in x/y=\\d+ format");
         let var = parts
             .next()
@@ -123,10 +128,12 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
             fold_lines.push(FoldLine::Y(along));
         }
     }
-    for fold_line in fold_lines.iter() {
-        grid = fold(grid, fold_line);
-        break;
-    }
+    grid = fold(
+        grid,
+        fold_lines
+            .get(0)
+            .expect("Got no lines to fold along, need at least one"),
+    );
     return grid.iter().flatten().filter(|&&b| b).count() as _;
 }
 

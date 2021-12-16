@@ -17,11 +17,15 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
-fn print_grid(grid: &Vec<Vec<bool>>) {
+fn print_grid(grid: &[Vec<bool>]) {
     for row in grid.iter() {
         for &value in row.iter() {
             if value {
@@ -120,7 +124,8 @@ fn solve(mut lines: Box<dyn Iterator<Item = String>>) -> u64 {
         parts.next();
         parts.next();
         let mut parts = parts
-            .next().map(|p| p.split('='))
+            .next()
+            .map(|p| p.split('='))
             .expect("Third word is not in x/y=\\d+ format");
         let var = parts
             .next()

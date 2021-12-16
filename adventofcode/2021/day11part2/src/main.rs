@@ -17,7 +17,11 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
@@ -35,15 +39,15 @@ fn simulate(grid: &mut Vec<Vec<u8>>) -> u64 {
     let mut buffer: Vec<(usize, usize)> = vec![];
     let mut visited: HashSet<(usize, usize)> = HashSet::new();
     let mut flashes = 0;
-    for i in 0..grid.len() {
-        for j in 0..grid[i].len() {
-            grid[i][j] = (grid[i][j] + 1) % 10;
+    for row in grid.iter_mut() {
+        for cell in row.iter_mut() {
+            *cell = (*cell + 1) % 10;
         }
     }
     loop {
-        for i in 0..grid.len() {
-            for j in 0..grid[i].len() {
-                if grid[i][j] == 0 && !visited.contains(&(i, j)) {
+        for (i, row) in grid.iter().enumerate() {
+            for (j, &cell) in row.iter().enumerate() {
+                if cell == 0 && !visited.contains(&(i, j)) {
                     visited.insert((i, j));
                     buffer.push((i, j));
                 }

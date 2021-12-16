@@ -17,27 +17,31 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Node<'a> {
-    START,
-    UPPER(&'a str),
-    LOWER(&'a str),
-    END,
+    Start,
+    Upper(&'a str),
+    Lower(&'a str),
+    End,
 }
 
-fn to_node<'a>(s: &'a str) -> Node<'a> {
+fn to_node(s: &str) -> Node {
     if s == "start" {
-        Node::START
+        Node::Start
     } else if s == "end" {
-        Node::END
+        Node::End
     } else if s.to_uppercase() == s {
-        Node::UPPER(s)
+        Node::Upper(s)
     } else {
-        Node::LOWER(s)
+        Node::Lower(s)
     }
 }
 
@@ -47,10 +51,10 @@ fn traverse<'a>(
     visited: &mut HashSet<&'a Node<'a>>,
     graph: &'a HashMap<Node<'a>, Vec<Node<'a>>>,
 ) -> u64 {
-    if *node == Node::END {
+    if *node == Node::End {
         1
     } else {
-        if let Node::LOWER(_) | Node::START = node {
+        if let Node::Lower(_) | Node::Start = node {
             visited.insert(node);
         }
 
@@ -61,7 +65,7 @@ fn traverse<'a>(
             }
         }
 
-        if let Node::LOWER(_) | Node::START = node {
+        if let Node::Lower(_) | Node::Start = node {
             visited.remove(node);
         }
 
@@ -88,7 +92,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
         graph.entry(v).or_default().push(u);
     }
     let mut visited: HashSet<&Node> = HashSet::new();
-    traverse(&Node::START, &mut visited, &graph)
+    traverse(&Node::Start, &mut visited, &graph)
 }
 
 fn main() {

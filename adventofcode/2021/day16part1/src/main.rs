@@ -19,14 +19,18 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
 #[derive(Debug)]
 enum PacketType {
-    OPERATOR(u64),
-    LITERAL(u64),
+    Operator(u64),
+    Literal(u64),
 }
 
 fn to_value(bits: &[char]) -> Result<u64, ParseIntError> {
@@ -47,7 +51,7 @@ impl<'a> Packet<'a> {
     }
 }
 
-fn to_packets<'a>(bits: &'a [char], num_packets: Option<usize>) -> (Vec<Packet<'a>>, usize) {
+fn to_packets(bits: &[char], num_packets: Option<usize>) -> (Vec<Packet>, usize) {
     let mut ptr = 0;
     let mut packets = vec![];
     match num_packets {
@@ -72,7 +76,7 @@ fn to_packets<'a>(bits: &'a [char], num_packets: Option<usize>) -> (Vec<Packet<'
     (packets, ptr)
 }
 
-fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
+fn to_packet(bits: &[char]) -> (Packet, usize) {
     let version = to_value(&bits[0..3]).unwrap();
     let packet_type = to_value(&bits[3..6]).unwrap();
     match packet_type {
@@ -89,7 +93,7 @@ fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
                         let packet = Packet {
                             bits: &bits[..ptr + 5],
                             version,
-                            packet_type: PacketType::LITERAL(literal),
+                            packet_type: PacketType::Literal(literal),
                             subpackets: vec![],
                         };
                         return (packet, ptr + 5);
@@ -108,7 +112,7 @@ fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
                 let packet = Packet {
                     bits: &bits[..22 + _bits_read],
                     version,
-                    packet_type: PacketType::OPERATOR(o),
+                    packet_type: PacketType::Operator(o),
                     subpackets,
                 };
                 (packet, 22 + _bits_read)
@@ -119,7 +123,7 @@ fn to_packet<'a>(bits: &'a [char]) -> (Packet<'a>, usize) {
                 let packet = Packet {
                     bits: &bits[..18 + _bits_read],
                     version,
-                    packet_type: PacketType::OPERATOR(o),
+                    packet_type: PacketType::Operator(o),
                     subpackets,
                 };
                 (packet, 18 + _bits_read)

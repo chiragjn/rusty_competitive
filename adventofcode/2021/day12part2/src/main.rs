@@ -17,43 +17,41 @@ impl Iterator for InputUtils {
     type Item = String;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.stream.lock().lines().next().map(|line| line.unwrap().trim().to_string())
+        self.stream
+            .lock()
+            .lines()
+            .next()
+            .map(|line| line.unwrap().trim().to_string())
     }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
 enum Node<'a> {
-    START,
-    UPPER(&'a str),
-    LOWER(&'a str),
-    END,
-    PLACEHOLDER,
+    Start,
+    Upper(&'a str),
+    Lower(&'a str),
+    End,
+    Placeholder,
 }
 
-fn to_node<'a>(s: &'a str) -> Node<'a> {
+fn to_node(s: &str) -> Node {
     if s == "start" {
-        Node::START
+        Node::Start
     } else if s == "end" {
-        Node::END
+        Node::End
     } else if s.to_uppercase() == s {
-        Node::UPPER(s)
+        Node::Upper(s)
     } else {
-        Node::LOWER(s)
+        Node::Lower(s)
     }
 }
 
 fn node_to_str<'a>(node: &'a Node) -> &'a str {
     match node {
-        Node::START => {
-            "start"
-        }
-        Node::END => {
-            "end"
-        }
-        Node::LOWER(x) | Node::UPPER(x) => {
-            x
-        }
-        Node::PLACEHOLDER => {
+        Node::Start => "start",
+        Node::End => "end",
+        Node::Lower(x) | Node::Upper(x) => x,
+        Node::Placeholder => {
             unreachable!("Node::PLACEHOLDER not supported");
         }
     }
@@ -74,7 +72,7 @@ impl<'a> PathsCounter<'a> {
         PathsCounter {
             graph,
             visited: HashSet::new(),
-            twice_allowed_for: &Node::PLACEHOLDER,
+            twice_allowed_for: &Node::Placeholder,
             visited_count: 0,
             buffer: vec![],
             paths: HashSet::new(),
@@ -82,7 +80,7 @@ impl<'a> PathsCounter<'a> {
     }
 
     fn _traverse(&mut self, node: &'a Node<'a>) -> u64 {
-        if *node == Node::END {
+        if *node == Node::End {
             self.paths.insert(self.buffer.join("-"));
             1
         } else {
@@ -92,7 +90,7 @@ impl<'a> PathsCounter<'a> {
                 if self.visited_count == 2 {
                     self.visited.insert(node);
                 }
-            } else if let Node::LOWER(_) | Node::START = node {
+            } else if let Node::Lower(_) | Node::Start = node {
                 self.visited.insert(node);
             }
 
@@ -106,7 +104,7 @@ impl<'a> PathsCounter<'a> {
             if node == self.twice_allowed_for {
                 self.visited_count -= 1;
                 self.visited.remove(node);
-            } else if let Node::LOWER(_) | Node::START = node {
+            } else if let Node::Lower(_) | Node::Start = node {
                 self.visited.remove(node);
             }
 
@@ -118,10 +116,10 @@ impl<'a> PathsCounter<'a> {
 
     fn count(&mut self) -> u64 {
         for node in self.graph.keys() {
-            if let Node::LOWER(_) = node {
+            if let Node::Lower(_) = node {
                 self.twice_allowed_for = node;
                 self.visited_count = 0;
-                self._traverse(&Node::START);
+                self._traverse(&Node::Start);
             }
         }
         self.paths.len() as u64
