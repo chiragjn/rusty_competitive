@@ -3,14 +3,12 @@ use std::io::{self, BufRead, Stdin};
 
 struct InputUtils {
     stream: Stdin,
-    buffer: String,
 }
 
 impl Default for InputUtils {
     fn default() -> Self {
         return Self {
             stream: io::stdin(),
-            buffer: String::new(),
         };
     }
 }
@@ -23,19 +21,6 @@ impl Iterator for InputUtils {
             Some(line) => Some(line.unwrap().trim().to_string()),
             None => None,
         }
-    }
-}
-
-fn print_grid(grid: &Vec<Vec<bool>>) {
-    for row in grid.iter() {
-        for &value in row.iter() {
-            if value {
-                print!("#");
-            } else {
-                print!(".");
-            }
-        }
-        println!("");
     }
 }
 

@@ -5,14 +5,12 @@ use std::{
 
 struct InputUtils {
     stream: Stdin,
-    buffer: String,
 }
 
 impl Default for InputUtils {
     fn default() -> Self {
         return Self {
             stream: io::stdin(),
-            buffer: String::new(),
         };
     }
 }

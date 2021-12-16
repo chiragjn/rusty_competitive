@@ -4,14 +4,12 @@ use std::iter::FromIterator;
 
 struct InputUtils {
     stream: Stdin,
-    buffer: String,
 }
 
 impl Default for InputUtils {
     fn default() -> Self {
         return Self {
             stream: io::stdin(),
-            buffer: String::new(),
         };
     }
 }
@@ -25,12 +23,6 @@ impl Iterator for InputUtils {
             None => None,
         }
     }
-}
-
-fn set_difference(a: &str, b: &str) -> HashSet<char> {
-    let aset: HashSet<char> = HashSet::from_iter(a.chars());
-    let bset: HashSet<char> = HashSet::from_iter(b.chars());
-    return HashSet::from_iter(aset.difference(&bset).into_iter().cloned());
 }
 
 fn is_subset(a: &str, b: &str) -> bool {

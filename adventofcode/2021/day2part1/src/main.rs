@@ -3,14 +3,12 @@ use std::io::{self, BufRead, Stdin};
 
 struct InputUtils {
     stream: Stdin,
-    buffer: String,
 }
 
 impl Default for InputUtils {
     fn default() -> Self {
         return Self {
             stream: io::stdin(),
-            buffer: String::new(),
         };
     }
 }
@@ -27,7 +25,6 @@ impl Iterator for InputUtils {
 }
 
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> i64 {
-    let mut answer = 0;
     let pattern = Regex::new(r"(?P<instruction>[a-z]+) (?P<times>\d+)").unwrap();
     let mut x: i64 = 0;
     let mut y: i64 = 0;
