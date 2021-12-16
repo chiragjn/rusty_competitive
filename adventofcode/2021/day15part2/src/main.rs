@@ -25,6 +25,16 @@ impl Iterator for InputUtils {
     }
 }
 
+fn get_value(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
+    let r = grid.len();
+    let c = grid.last().unwrap().len();
+    let tile_i = x / r;
+    let tile_j = y / c;
+    let i = x - (r * tile_i);
+    let j = y - (c * tile_j);
+    return ((grid[i][j] + (tile_i as u64) + (tile_j as u64) - 1) % 9) + 1;
+}
+
 fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     let mut grid: Vec<Vec<u64>> = vec![];
     for line in lines {
@@ -40,28 +50,37 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     }
     let r = grid.len();
     let c = grid.last().unwrap().len();
-    let mut cache: Vec<Vec<u64>> = vec![vec![0; c]; r];
-    cache[r - 1][c - 1] = grid[r - 1][c - 1];
-    for i in (0..r).rev() {
-        for j in (0..c).rev() {
-            if i == r - 1 && j == c - 1 {
+    let nr = r * 5;
+    let nc = c * 5;
+    let mut cache: Vec<Vec<u64>> = vec![vec![0; nc]; 2];
+    let mut G = vec![];
+    for i in (0..nr).rev() {
+        for j in (0..nc).rev() {
+            let value = get_value(&grid, i, j);
+            if i == nr - 1 && j == nc - 1 {
+                cache[0][j] = value;
                 continue;
             }
-            let right = if j < c - 1 && cache[i][j + 1] < u64::MAX {
-                grid[i][j] + cache[i][j + 1]
+            let right = if j < nc - 1 && cache[0][j + 1] < u64::MAX {
+                value + cache[0][j + 1]
             } else {
                 u64::MAX
             };
-            let down = if i < r - 1 && cache[i + 1][j] < u64::MAX {
-                grid[i][j] + cache[i + 1][j]
+            let down = if i < nr - 1 && cache[1][j] < u64::MAX {
+                value + cache[1][j]
             } else {
                 u64::MAX
             };
-            cache[i][j] = std::cmp::min(right, down);
+            cache[0][j] = std::cmp::min(right, down);
         }
+        G.push(cache[0].clone());
+        cache.swap(0, 1);
     }
-
-    return cache[0][0] - grid[0][0];
+    G.reverse();
+    for i in 0..nr {
+        println!("{:?} ... {:?}", &G[i][0..5], &G[i][(nc - 5)..nc]);
+    }
+    return cache[1][0] - grid[0][0];
 }
 
 fn main() {
@@ -90,6 +109,6 @@ mod tests {
             .split('\n')
             .into_iter()
             .map(|part| part.to_string());
-        assert_eq!(solve(Box::new(it)), 40);
+        assert_eq!(solve(Box::new(it)), 315);
     }
 }
