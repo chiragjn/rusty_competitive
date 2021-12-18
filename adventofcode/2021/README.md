@@ -4,7 +4,7 @@ https://adventofcode.com/2021
 
 TODO:
 
-- [ ] Fix Day 15 code 
+- [ ] Optimize Day 15
 - [ ] Optimize Day 17
 
 Check clippy

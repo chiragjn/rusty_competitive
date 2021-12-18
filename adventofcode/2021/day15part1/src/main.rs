@@ -1,4 +1,10 @@
-use std::io::{self, BufRead, Stdin};
+use std::{
+    cmp::Reverse,
+    collections::HashMap,
+    io::{self, BufRead, Stdin},
+};
+
+use priority_queue::PriorityQueue;
 
 struct InputUtils {
     stream: Stdin,
@@ -37,30 +43,36 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     if grid.is_empty() || grid.last().unwrap().is_empty() {
         return 0;
     }
-    let r = grid.len();
-    let c = grid.last().unwrap().len();
-    let mut cache: Vec<Vec<u64>> = vec![vec![0; c]; r];
-    cache[r - 1][c - 1] = grid[r - 1][c - 1];
-    for i in (0..r).rev() {
-        for j in (0..c).rev() {
+    let r = grid.len() as isize;
+    let c = grid.last().unwrap().len() as isize;
+    let mut queue: PriorityQueue<(isize, isize), Reverse<u64>> = PriorityQueue::new();
+    let mut distances: HashMap<(isize, isize), u64> = HashMap::new();
+    let deltas: [(isize, isize); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    queue.push((0, 0), Reverse(0));
+    distances.insert((0, 0), 0);
+    while !queue.is_empty() {
+        if let Some(((i, j), Reverse(p))) = queue.pop() {
             if i == r - 1 && j == c - 1 {
-                continue;
+                return p;
             }
-            let right = if j < c - 1 && cache[i][j + 1] < u64::MAX {
-                grid[i][j] + cache[i][j + 1]
-            } else {
-                u64::MAX
-            };
-            let down = if i < r - 1 && cache[i + 1][j] < u64::MAX {
-                grid[i][j] + cache[i + 1][j]
-            } else {
-                u64::MAX
-            };
-            cache[i][j] = std::cmp::min(right, down);
+            for &(dx, dy) in deltas.iter() {
+                let u = i + dx;
+                let v = j + dy;
+                if u >= 0 && u < r && v >= 0 && v < c {
+                    let new_p = p + grid[u as usize][v as usize];
+                    if new_p < *distances.get(&(u, v)).unwrap_or(&u64::MAX) {
+                        distances.insert((u, v), new_p);
+                        if queue.get_priority(&(u, v)).is_some() {
+                            queue.change_priority(&(u, v), Reverse(new_p));
+                        } else {
+                            queue.push((u, v), Reverse(new_p));
+                        }
+                    }
+                }
+            }
         }
     }
-
-    cache[0][0] - grid[0][0]
+    unreachable!("Why are we still here? Just to suffer? The end of the grid should be reachable!");
 }
 
 fn main() {

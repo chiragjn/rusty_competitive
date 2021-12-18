@@ -1,4 +1,9 @@
-use std::io::{self, BufRead, Stdin};
+use priority_queue::PriorityQueue;
+use std::{
+    cmp::Reverse,
+    collections::HashMap,
+    io::{self, BufRead, Stdin},
+};
 
 struct InputUtils {
     stream: Stdin,
@@ -24,13 +29,13 @@ impl Iterator for InputUtils {
     }
 }
 
-fn get_value(grid: &Vec<Vec<u64>>, x: usize, y: usize) -> u64 {
-    let r = grid.len();
-    let c = grid.last().unwrap().len();
-    let tile_i = x / r;
-    let tile_j = y / c;
-    let i = x - (r * tile_i);
-    let j = y - (c * tile_j);
+fn get_value(grid: &[Vec<u64>], x: usize, y: usize) -> u64 {
+    let row_len = grid.len();
+    let col_len = grid.last().unwrap().len();
+    let tile_i = x / row_len;
+    let tile_j = y / col_len;
+    let i = x - (row_len * tile_i);
+    let j = y - (col_len * tile_j);
     ((grid[i][j] + (tile_i as u64) + (tile_j as u64) - 1) % 9) + 1
 }
 
@@ -49,37 +54,36 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
     }
     let r = grid.len();
     let c = grid.last().unwrap().len();
-    let nr = r * 5;
-    let nc = c * 5;
-    let mut cache: Vec<Vec<u64>> = vec![vec![0; nc]; 2];
-    let mut G = vec![];
-    for i in (0..nr).rev() {
-        for j in (0..nc).rev() {
-            let value = get_value(&grid, i, j);
+    let nr = (r * 5) as isize;
+    let nc = (c * 5) as isize;
+    let mut queue: PriorityQueue<(isize, isize), Reverse<u64>> = PriorityQueue::new();
+    let mut distances: HashMap<(isize, isize), u64> = HashMap::new();
+    let deltas: [(isize, isize); 4] = [(-1, 0), (1, 0), (0, -1), (0, 1)];
+    queue.push((0, 0), Reverse(0));
+    distances.insert((0, 0), 0);
+    while !queue.is_empty() {
+        if let Some(((i, j), Reverse(p))) = queue.pop() {
             if i == nr - 1 && j == nc - 1 {
-                cache[0][j] = value;
-                continue;
+                return p;
             }
-            let right = if j < nc - 1 && cache[0][j + 1] < u64::MAX {
-                value + cache[0][j + 1]
-            } else {
-                u64::MAX
-            };
-            let down = if i < nr - 1 && cache[1][j] < u64::MAX {
-                value + cache[1][j]
-            } else {
-                u64::MAX
-            };
-            cache[0][j] = std::cmp::min(right, down);
+            for &(dx, dy) in deltas.iter() {
+                let u = i + dx;
+                let v = j + dy;
+                if u >= 0 && u < nr && v >= 0 && v < nc {
+                    let new_p = p + get_value(&grid, u as usize, v as usize);
+                    if new_p < *distances.get(&(u, v)).unwrap_or(&u64::MAX) {
+                        distances.insert((u, v), new_p);
+                        if queue.get_priority(&(u, v)).is_some() {
+                            queue.change_priority(&(u, v), Reverse(new_p));
+                        } else {
+                            queue.push((u, v), Reverse(new_p));
+                        }
+                    }
+                }
+            }
         }
-        G.push(cache[0].clone());
-        cache.swap(0, 1);
     }
-    G.reverse();
-    for i in 0..nr {
-        println!("{:?} ... {:?}", &G[i][0..5], &G[i][(nc - 5)..nc]);
-    }
-    cache[1][0] - grid[0][0]
+    unreachable!("Why are we still here? Just to suffer? The end of the grid should be reachable!");
 }
 
 fn main() {
