@@ -7,6 +7,8 @@ TODO:
 - [ ] Optimize Day 12
 - [ ] Optimize Day 15
 - [ ] Optimize Day 17
+- [ ] Optimize Day 19, it is very slowwwwwwwwwwwww, even with
+  `--release`
 
 Check clippy
 
