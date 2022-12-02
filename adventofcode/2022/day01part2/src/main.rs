@@ -31,8 +31,7 @@ fn solve(lines: Box<dyn Iterator<Item = String>>) -> u64 {
         if line.trim().is_empty() {
             cals.push(running_cal);
             running_cal = 0;
-        }
-        else {
+        } else {
             running_cal += line.parse::<u64>().expect("Failed parsing to u64");
         }
     }
